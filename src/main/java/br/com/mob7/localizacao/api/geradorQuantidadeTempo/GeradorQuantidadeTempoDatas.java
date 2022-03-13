@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import br.com.mob7.localizacao.api.controller.dto.BasePoisDefPosicoesDTO;
 import br.com.mob7.localizacao.api.model.BasePoisDef;
-import br.com.mob7.localizacao.api.model.Posicoes;
 import br.com.mob7.localizacao.api.model.Veiculo;
 import br.com.mob7.localizacao.api.repository.BasePoisDefRepository;
 import br.com.mob7.localizacao.api.repository.PosicoesRepository;
@@ -30,28 +29,31 @@ public class GeradorQuantidadeTempoDatas extends GeradorQuantidadeTempo {
 	public VeiculoRepository veiculoRepository;
 	
 	@Override
-	public List<BasePoisDefPosicoesDTO> calcular(Object... objects) {
+	public List<BasePoisDefPosicoesDTO> calcular(Object... data) {
 		List<BasePoisDef> listaPois = basePoisDefRepository.findAll();
 		List<Veiculo> listaVeiculos = veiculoRepository.findAll();
-		List<Posicoes> listaPosicoesFiltrada = new ArrayList<>();
-		List<BasePoisDefPosicoesDTO> listaBasePoisDefPosicoes = new ArrayList<>();
 		
 		for (BasePoisDef poi : listaPois) {
 			for (Veiculo veiculo : listaVeiculos) {
-				LocalDateTime primeiraData = LocalDate.parse(objects[0].toString()).atStartOfDay();
-				LocalDateTime segundaData = LocalDate.parse(objects[1].toString()).atStartOfDay();
-				List<Posicoes> listaPosicoes = posicoesRepository.findByVeiculoAndDataPosicaoBetween(veiculo, primeiraData, segundaData);
+				listaPosicoes = posicoesRepository.findByVeiculoAndDataPosicaoBetween(veiculo, extrairPrimeiraData(data), extrairSegundaData(data));
 				ultimaPosicao = null;
 				somaQuantidadeTempoPoi = 0L;
 
-				calcularQuantidadeTempoPorPoi(listaPosicoesFiltrada, poi, listaPosicoes, ultimaPosicao);
-				listaBasePoisDefPosicoes.add(inserirPoiPorTempoCalculado(poi, veiculo, listaPosicoesFiltrada));					
-				
+				calcularQuantidadeTempoPorPoi(poi);
+				listaBasePoisDefPosicoes.add(inserirPoiPorTempoCalculado(poi, veiculo));					
 				listaPosicoesFiltrada = new ArrayList<>();
 			}
 		}
 				
 		return listaBasePoisDefPosicoes.stream().filter(f -> f.getNomePoi() != null).collect(Collectors.toList());
+	}
+
+	private LocalDateTime extrairSegundaData(Object... data) {
+		return LocalDate.parse(data[1].toString()).atStartOfDay();
+	}
+
+	private LocalDateTime extrairPrimeiraData(Object... data) {
+		return LocalDate.parse(data[0].toString()).atStartOfDay();
 	}
 
 }

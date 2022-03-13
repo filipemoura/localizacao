@@ -1,6 +1,5 @@
 package br.com.mob7.localizacao.api.geradorQuantidadeTempo;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import br.com.mob7.localizacao.api.controller.dto.BasePoisDefPosicoesDTO;
 import br.com.mob7.localizacao.api.model.BasePoisDef;
-import br.com.mob7.localizacao.api.model.Posicoes;
 import br.com.mob7.localizacao.api.model.Veiculo;
 import br.com.mob7.localizacao.api.repository.BasePoisDefRepository;
 import br.com.mob7.localizacao.api.repository.PosicoesRepository;
@@ -29,21 +27,18 @@ public class GeradorQuantidadeTempoPlaca extends GeradorQuantidadeTempo {
 	public VeiculoRepository veiculoRepository;
 	
 	@Override
-	public List<BasePoisDefPosicoesDTO> calcular(Object... objects) {
+	public List<BasePoisDefPosicoesDTO> calcular(Object... placa) {
 		List<BasePoisDef> listaPois = basePoisDefRepository.findAll();
-		List<Veiculo> listaVeiculos = veiculoRepository.findByPlaca(objects[0].toString());
-		List<Posicoes> listaPosicoesFiltrada = new ArrayList<>();
-		List<BasePoisDefPosicoesDTO> listaBasePoisDefPosicoes = new ArrayList<>();
+		List<Veiculo> listaVeiculos = veiculoRepository.findByPlaca(placa[0].toString());
 		
 		for (BasePoisDef poi : listaPois) {
 			for (Veiculo veiculo : listaVeiculos) {
-				List<Posicoes> listaPosicoes = posicoesRepository.findByVeiculo(veiculo);
-				LocalDateTime ultimaPosicao = null;
-				Long somaQuantidadeTempoPoi = 0L;
+				listaPosicoes = posicoesRepository.findByVeiculo(veiculo);
+				ultimaPosicao = null;
+				somaQuantidadeTempoPoi = 0L;
 
-//				somaQuantidadeTempoPoi = calcularQuantidadeTempoPorPoi(listaPosicoesFiltrada, poi, listaPosicoes, ultimaPosicao, somaQuantidadeTempoPoi);
-//				listaBasePoisDefPosicoes.add(inserirPoiPorTempoCalculado(poi, veiculo, somaQuantidadeTempoPoi, listaPosicoesFiltrada));					
-				
+				calcularQuantidadeTempoPorPoi(poi);
+				listaBasePoisDefPosicoes.add(inserirPoiPorTempoCalculado(poi, veiculo));					
 				listaPosicoesFiltrada = new ArrayList<>();
 			}
 		}
