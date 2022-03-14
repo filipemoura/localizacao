@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.mob7.localizacao.api.controller.dto.BasePoisDefPosicoesDTO;
 import br.com.mob7.localizacao.api.model.BasePoisDef;
+import br.com.mob7.localizacao.api.model.Posicoes;
 import br.com.mob7.localizacao.api.model.Veiculo;
 import br.com.mob7.localizacao.api.repository.BasePoisDefRepository;
 import br.com.mob7.localizacao.api.repository.PosicoesRepository;
@@ -32,15 +33,14 @@ public class GeradorQuantidadeTempoDatas extends GeradorQuantidadeTempo {
 	public List<BasePoisDefPosicoesDTO> calcular(Object... data) {
 		List<BasePoisDef> listaPois = basePoisDefRepository.findAll();
 		List<Veiculo> listaVeiculos = veiculoRepository.findAll();
+		listaBasePoisDefPosicoes = new ArrayList<>();
+		listaPosicoesFiltrada = new ArrayList<>();
+		List<Posicoes> listaPosicoes = new ArrayList<>();
 		
 		for (BasePoisDef poi : listaPois) {
 			for (Veiculo veiculo : listaVeiculos) {
-				listaPosicoes = posicoesRepository.findByVeiculoAndDataPosicaoBetween(veiculo, extrairPrimeiraData(data), extrairSegundaData(data));
-				ultimaPosicao = null;
-				somaQuantidadeTempoPoi = 0L;
-
-				calcularQuantidadeTempoPorPoi(poi);
-				listaBasePoisDefPosicoes.add(inserirPoiPorTempoCalculado(poi, veiculo));					
+				listaPosicoes = posicoesRepository.findByVeiculoAndDataPosicaoBetweenOrderByIdAsc(veiculo, extrairPrimeiraData(data), extrairSegundaData(data));
+				adicionarQuantidadeTempoPorPoi(poi, veiculo, listaPosicoes);					
 				listaPosicoesFiltrada = new ArrayList<>();
 			}
 		}

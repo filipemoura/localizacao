@@ -16,7 +16,6 @@ public abstract class GeradorQuantidadeTempo {
 	protected LocalDateTime ultimaPosicao;
 	protected List<Posicoes> listaPosicoesFiltrada = new ArrayList<>();
 	protected List<BasePoisDefPosicoesDTO> listaBasePoisDefPosicoes = new ArrayList<>();
-	protected List<Posicoes> listaPosicoes = new ArrayList<>();
 	
 	public abstract List<BasePoisDefPosicoesDTO> calcular(Object... objects);
 	
@@ -28,7 +27,10 @@ public abstract class GeradorQuantidadeTempo {
 						new BasePoisDefPosicoesDTO();
 	}
 	
-	public Long calcularQuantidadeTempoPorPoi(BasePoisDef poi) {
+	public void calcularQuantidadeTempoPorPoi(BasePoisDef poi, List<Posicoes> listaPosicoes) {
+		ultimaPosicao = null;
+		somaQuantidadeTempoPoi = 0L;
+		
 		for (Posicoes posicao : listaPosicoes) {
 			Double distanciaMetrosPoi = DateUtils.formulaHaversine(poi.getLatitude(), poi.getLongitude(),
 					posicao.getLatitude(), posicao.getLongitude());
@@ -45,6 +47,10 @@ public abstract class GeradorQuantidadeTempo {
 				ultimaPosicao = null;
 			}
 		}
-		return somaQuantidadeTempoPoi;
+	}
+	
+	public void adicionarQuantidadeTempoPorPoi(BasePoisDef poi, Veiculo veiculo, List<Posicoes> listaPosicoes) {
+		calcularQuantidadeTempoPorPoi(poi, listaPosicoes);
+		listaBasePoisDefPosicoes.add(inserirPoiPorTempoCalculado(poi, veiculo));
 	}
 }

@@ -1,19 +1,23 @@
 package br.com.mob7.localizacao.api.controller;
 
 import java.time.LocalDate;
-import java.util.List;
+
+import javax.validation.constraints.Size;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.mob7.localizacao.api.controller.dto.BasePoisDefPosicoesDTO;
 import br.com.mob7.localizacao.api.geradorQuantidadeTempo.GeradorQuantidadeTempoDatas;
 import br.com.mob7.localizacao.api.geradorQuantidadeTempo.GeradorQuantidadeTempoPlaca;
 import br.com.mob7.localizacao.api.geradorQuantidadeTempo.GeradorQuantidadeTempoSemFiltro;
 
+@Validated
 @RestController
 @RequestMapping("/posicoes")
 public class PosicoesController {
@@ -28,18 +32,19 @@ public class PosicoesController {
 	public GeradorQuantidadeTempoDatas geradorQuantidadeTempoDatas;
 	
 	@GetMapping("/listaPorTodos")
-	public List<BasePoisDefPosicoesDTO> listaPorTodos() {
-		return geradorQuantidadeTempoSemFiltro.calcular();
+	public ResponseEntity<?> listaPorTodos() {
+		return ResponseEntity.ok(geradorQuantidadeTempoSemFiltro.calcular());			
 	}
 	
 	@GetMapping("/listaPorPlaca")
-	public List<BasePoisDefPosicoesDTO> listaPorPlaca(@RequestParam String placa) {
-		return geradorQuantidadeTempoPlaca.calcular(placa);
+	public ResponseEntity<?> listaPorPlaca(@RequestParam @Size(min = 1, max = 8) String placa) {
+		return ResponseEntity.ok(geradorQuantidadeTempoPlaca.calcular(placa));			
 	}
 	
 	@GetMapping("/listaPorData")
-	public List<BasePoisDefPosicoesDTO> listaPorData(@RequestParam LocalDate dataInicial, @RequestParam LocalDate dataFinal) {
-		return geradorQuantidadeTempoDatas.calcular(dataInicial, dataFinal);
+	public ResponseEntity<?> listaPorData(@RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate dataInicial, 
+			@RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate dataFinal) {
+		return ResponseEntity.ok(geradorQuantidadeTempoDatas.calcular(dataInicial, dataFinal));			
 	}
 
 }

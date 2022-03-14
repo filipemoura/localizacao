@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.mob7.localizacao.api.controller.dto.BasePoisDefPosicoesDTO;
 import br.com.mob7.localizacao.api.model.BasePoisDef;
+import br.com.mob7.localizacao.api.model.Posicoes;
 import br.com.mob7.localizacao.api.model.Veiculo;
 import br.com.mob7.localizacao.api.repository.BasePoisDefRepository;
 import br.com.mob7.localizacao.api.repository.PosicoesRepository;
@@ -30,15 +31,14 @@ public class GeradorQuantidadeTempoPlaca extends GeradorQuantidadeTempo {
 	public List<BasePoisDefPosicoesDTO> calcular(Object... placa) {
 		List<BasePoisDef> listaPois = basePoisDefRepository.findAll();
 		List<Veiculo> listaVeiculos = veiculoRepository.findByPlaca(placa[0].toString());
+		listaBasePoisDefPosicoes = new ArrayList<>();
+		listaPosicoesFiltrada = new ArrayList<>();
+		List<Posicoes> listaPosicoes = new ArrayList<>();
 		
 		for (BasePoisDef poi : listaPois) {
 			for (Veiculo veiculo : listaVeiculos) {
-				listaPosicoes = posicoesRepository.findByVeiculo(veiculo);
-				ultimaPosicao = null;
-				somaQuantidadeTempoPoi = 0L;
-
-				calcularQuantidadeTempoPorPoi(poi);
-				listaBasePoisDefPosicoes.add(inserirPoiPorTempoCalculado(poi, veiculo));					
+				listaPosicoes = posicoesRepository.findByVeiculoOrderByIdAsc(veiculo);
+				adicionarQuantidadeTempoPorPoi(poi, veiculo, listaPosicoes);					
 				listaPosicoesFiltrada = new ArrayList<>();
 			}
 		}

@@ -10,8 +10,8 @@ import br.com.mob7.localizacao.api.model.Veiculo;
 
 public interface PosicoesRepository extends JpaRepository<Posicoes, Long> {
 	
-	public List<Posicoes> findByVeiculo(Veiculo veiculo);
+	public List<Posicoes> findByVeiculoOrderByIdAsc(Veiculo veiculo);
 	
-	public List<Posicoes> findByVeiculoAndDataPosicaoBetween(Veiculo veiculo, LocalDateTime primeiraData, LocalDateTime segundaData);
+	public List<Posicoes> findByVeiculoAndDataPosicaoBetweenOrderByIdAsc(Veiculo veiculo, LocalDateTime primeiraData, LocalDateTime segundaData);
 
 }
